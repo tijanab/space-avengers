@@ -1,10 +1,20 @@
 body {
     margin: 0px;
     bottom: 0px;
-    background-color: dimgrey;
+    
+    background-image: url("images/space.jpeg");
+    background-size:cover; 
+    
     font-family: "Century Gothic";
 }
 
 h1 {
+    text-align: center;
     color: aliceblue;
+    //background-color: dimgrey;
+    
+    margin-top: 20px;
+    margin-right: 250px;
+    margin-left: 250px;
+    font-size: 50px;
 }

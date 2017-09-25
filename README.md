@@ -1,2 +1,4 @@
 # space-avengers
-Tjejer Kodar - spel
+Tjejer Kodar Project
+
+Space avengers - a game in space!
