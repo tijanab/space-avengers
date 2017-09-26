@@ -6,12 +6,12 @@
         <title>SPACE AVENGERS</title>
     </head>
     <body>
-        <script> 
-            var game = new Phaser.Game(400, 600, Phaser.AUTO, 'gameContainer');
-        </script>
         <h1>SPACE AVENGERS</h1>
         <p>A <b>thrilling</b> game in space!</p>
         <div id="gameContainer"></div>
+        <script> 
+            var game = new Phaser.Game(1000, 600, Phaser.AUTO, 'gameContainer');
+        </script>
         <script> 
             game.state.add('MainGame', mainGameState);
             game.state.start("MainGame");
