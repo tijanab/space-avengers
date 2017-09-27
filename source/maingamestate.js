@@ -62,8 +62,20 @@ mainGameState.create = function() {
     this.playerHitSfx.push(game.add.audio("asteroid_hit_05"));
     this.playerHitSfx.push(game.add.audio("asteroid_hit_06"));
     
+    
+    var textStyle = {
+    font: "16px Arial", 
+    fill: "#ffffff", 
+    align: "center"
+}
+    this.scoreTitle=game.add.text(game.width*0.85, 30, "SCORE: ", textStyle);
+    this.scoreTitle.fixedToCamera = true;
+    this.scoreTitle.anchor.setTo(0.5, 0.5);
+    
+    this.scoreValue=game.add.text(game.width*0.95, 30, "0", textStyle);
+    this.scoreValue.fixedToCamera = true;
+    this.scoreValue.anchor.setTo(0.5, 0.5);
     this.playerScore = 0;
-    game.add.text(x, y, text, displayOptions);
 }
 
 mainGameState.update = function() {
@@ -94,6 +106,8 @@ mainGameState.update = function() {
     }
     
     game.physics.arcade.collide(this.asteroids, this.playerLaser, mainGameState.onAsteroidLaserCollision, null, this);
+    
+    this.scoreValue.setText(this.playerScore);
 }
 
 mainGameState.updatePlayer = function(){
@@ -103,13 +117,7 @@ mainGameState.updatePlayer = function(){
     }
     else if (this.cursors.left.isDown){
         this.playerShip.body.velocity.x = -300;
-    }
-    /*else if (this.cursors.down.isDown){
-        this.playerShip.body.velocity.y = 300;
-    }*/
-    /*else if (this.cursors.up.isDown){
-        this.playerShip.body.velocity.y = -300;
-    }*/ else{
+    } else{
         this.playerShip.body.velocity.x = 0;
         this.playerShip.body.velocity.y = 0;
     }
@@ -120,17 +128,11 @@ mainGameState.updatePlayer = function(){
     if ((this.playerShip.x < 0) && (this.playerShip.body.velocity.x < 0)){
         this.playerShip.body.velocity.x = 0;
     }
-    /*if ((this.playerShip.y > game.height) && (this.playerShip.body.velocity.y > 0)){
-        this.playerShip.body.velocity.y = 0;
-    }
-    if ((this.playerShip.y < 0) && (this.playerShip.body.velocity.y < 0)){
-        this.playerShip.body.velocity.y = 0;
-    }*/
 }
 
 mainGameState.spawnAsteroid = function(){
     var arrAsteroid = [
-        "asteroid-large-01", "asteroid-medium-01", "asteroid-medium-01"
+        "asteroid-large-01", "asteroid-medium-01", "asteroid-small-01"
     ];
 
     var x = game.rnd.integerInRange(0, game.width);
@@ -162,6 +164,9 @@ mainGameState.spawnLaser = function(){
 mainGameState.onAsteroidLaserCollision = function(asteroid, laser){
     asteroid.destroy();
     laser.destroy();
+    
+    this.playerScore++;
+    
     var index = game.rnd.integerInRange(0, this.playerHitSfx.length - 1);
     this.playerHitSfx[index].play();
 }
