@@ -2,7 +2,6 @@ var mainGameState = {
 }
 
 mainGameState.preload = function() {
-    console.log("Pre-loading the Game");
     game.load.image("space", "images/space.jpeg");
     game.load.image("player-ship",
                     "SpaceShooterRedux/PNG/playerShip2_red.png");
@@ -12,8 +11,20 @@ mainGameState.preload = function() {
     game.load.image("laser", "SpaceShooterRedux/PNG/Lasers/laserRed16.png");
     
     game.load.audio("player_fire_01", "assets/audio/player_fire_01.mp3");
+    game.load.audio("player_fire_02", "assets/audio/player_fire_02.mp3");
+    game.load.audio("player_fire_03", "assets/audio/player_fire_03.mp3");
+    game.load.audio("player_fire_04", "assets/audio/player_fire_04.mp3");
+    game.load.audio("player_fire_05", "assets/audio/player_fire_05.mp3");
+    game.load.audio("player_fire_06", "assets/audio/player_fire_06.mp3");
     game.load.audio("asteroid_hit_01", "assets/audio/asteroid_hit_01.mp3");
-    game.load.audio("asteroid_death_01", "assets/audio/asteroid_death_01.mp3");
+    game.load.audio("asteroid_hit_02", "assets/audio/asteroid_hit_02.mp3");
+    game.load.audio("asteroid_hit_03", "assets/audio/asteroid_hit_03.mp3");
+    game.load.audio("asteroid_hit_04", "assets/audio/asteroid_hit_04.mp3");
+    game.load.audio("asteroid_hit_05", "assets/audio/asteroid_hit_05.mp3");
+    game.load.audio("asteroid_hit_06", "assets/audio/asteroid_hit_06.mp3");
+    /*game.load.audio("asteroid_death_01", "assets/audio/asteroid_death_01.mp3");
+    game.load.audio("asteroid_death_01", "assets/audio/asteroid_death_02.mp3");
+    game.load.audio("asteroid_death_01", "assets/audio/asteroid_death_03.mp3");*/
 }
 
 mainGameState.create = function() { 
@@ -36,9 +47,23 @@ mainGameState.create = function() {
     this.fireTimer = 0.4;
     
     this.playerFireSfx = [];
-    this.playerFireSfx.push(game.add.audio("asteroid_hit_01"));
-    this.playerFireSfx.push(game.add.audio("asteroid_death_01"));
     this.playerFireSfx.push(game.add.audio("player_fire_01"));
+    this.playerFireSfx.push(game.add.audio("player_fire_02"));
+    this.playerFireSfx.push(game.add.audio("player_fire_03"));
+    this.playerFireSfx.push(game.add.audio("player_fire_04"));
+    this.playerFireSfx.push(game.add.audio("player_fire_05"));
+    this.playerFireSfx.push(game.add.audio("player_fire_06"));
+    
+    this.playerHitSfx = [];
+    this.playerHitSfx.push(game.add.audio("asteroid_hit_01"));
+    this.playerHitSfx.push(game.add.audio("asteroid_hit_02"));
+    this.playerHitSfx.push(game.add.audio("asteroid_hit_03"));
+    this.playerHitSfx.push(game.add.audio("asteroid_hit_04"));
+    this.playerHitSfx.push(game.add.audio("asteroid_hit_05"));
+    this.playerHitSfx.push(game.add.audio("asteroid_hit_06"));
+    
+    this.playerScore = 0;
+    game.add.text(x, y, text, displayOptions);
 }
 
 mainGameState.update = function() {
@@ -130,11 +155,15 @@ mainGameState.spawnLaser = function(){
 
         this.playerLaser.add(laser);
     }
+    var index = game.rnd.integerInRange(0, this.playerFireSfx.length - 1);
+    this.playerFireSfx[index].play();
 }
 
 mainGameState.onAsteroidLaserCollision = function(asteroid, laser){
     asteroid.destroy();
     laser.destroy();
+    var index = game.rnd.integerInRange(0, this.playerHitSfx.length - 1);
+    this.playerHitSfx[index].play();
 }
 
 
