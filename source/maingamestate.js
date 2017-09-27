@@ -9,7 +9,7 @@ mainGameState.preload = function() {
     game.load.image("asteroid-medium-01", "SpaceShooterRedux/PNG/Meteors/meteorBrown_med1.png");
     game.load.image("asteroid-small-01", "SpaceShooterRedux/PNG/Meteors/meteorBrown_small1.png");
     game.load.image("laser", "SpaceShooterRedux/PNG/Lasers/laserRed16.png");
-    
+
     game.load.audio("player_fire_01", "assets/audio/player_fire_01.mp3");
     game.load.audio("player_fire_02", "assets/audio/player_fire_02.mp3");
     game.load.audio("player_fire_03", "assets/audio/player_fire_03.mp3");
@@ -45,7 +45,7 @@ mainGameState.create = function() {
     this.fireKey = game.input.keyboard.addKey(Phaser.Keyboard.Z);
     this.playerLaser = game.add.group();   
     this.fireTimer = 0.4;
-    
+
     this.playerFireSfx = [];
     this.playerFireSfx.push(game.add.audio("player_fire_01"));
     this.playerFireSfx.push(game.add.audio("player_fire_02"));
@@ -53,7 +53,7 @@ mainGameState.create = function() {
     this.playerFireSfx.push(game.add.audio("player_fire_04"));
     this.playerFireSfx.push(game.add.audio("player_fire_05"));
     this.playerFireSfx.push(game.add.audio("player_fire_06"));
-    
+
     this.playerHitSfx = [];
     this.playerHitSfx.push(game.add.audio("asteroid_hit_01"));
     this.playerHitSfx.push(game.add.audio("asteroid_hit_02"));
@@ -61,21 +61,30 @@ mainGameState.create = function() {
     this.playerHitSfx.push(game.add.audio("asteroid_hit_04"));
     this.playerHitSfx.push(game.add.audio("asteroid_hit_05"));
     this.playerHitSfx.push(game.add.audio("asteroid_hit_06"));
-    
-    
+
+
     var textStyle = {
-    font: "16px Arial", 
-    fill: "#ffffff", 
-    align: "center"
-}
-    this.scoreTitle=game.add.text(game.width*0.85, 30, "SCORE: ", textStyle);
+        font: "16px Arial", 
+        fill: "#ffffff", 
+        align: "center"
+    }
+    this.scoreTitle = game.add.text(game.width*0.85, 30, "SCORE: ", textStyle);
     this.scoreTitle.fixedToCamera = true;
     this.scoreTitle.anchor.setTo(0.5, 0.5);
-    
-    this.scoreValue=game.add.text(game.width*0.95, 30, "0", textStyle);
+    this.scoreValue = game.add.text(game.width*0.95, 30, "0", textStyle);
     this.scoreValue.fixedToCamera = true;
     this.scoreValue.anchor.setTo(0.5, 0.5);
     this.playerScore = 0;
+    
+    this.lifeTitle = game.add.text(game.width*0.1, 30, "LIFE: ", textStyle);
+    this.lifeTitle.fixedToCamera = true;
+    this.lifeTitle.anchor.setTo(0.5, 0.5);
+    this.livesValue = game.add.text(game.width*0.2, 30, "3", textStyle);
+    this.livesValue.fixedToCamera = true;
+    this.livesValue.anchor.setTo(0.5, 0.5);
+    
+    game.physics.arcade.enable(this.playerShip);
+    this.playerLife = 3;
 }
 
 mainGameState.update = function() {
@@ -86,7 +95,6 @@ mainGameState.update = function() {
         this.spawnAsteroid();
         this.asteroidTimer = game.rnd.integerInRange(1.0, 3.0);;
     }
-
     for(var i = 0; i < this.asteroids.children.length; i++){
         if(this.asteroids.children[i].y > (game.height + 200)){
             this.asteroids.children[i].destroy();
@@ -96,18 +104,17 @@ mainGameState.update = function() {
     if (this.fireKey.isDown) {
         this.spawnLaser();
     }
-
     this.fireTimer -= game.time.physicsElapsed;
-
     for(var i = 0; i< this.playerLaser.children.length; i++){
         if(this.playerLaser.children[i].y < -200){
             this.playerLaser.children[i].destroy();
         }
     }
-    
     game.physics.arcade.collide(this.asteroids, this.playerLaser, mainGameState.onAsteroidLaserCollision, null, this);
-    
     this.scoreValue.setText(this.playerScore);
+
+    game.physics.arcade.collide(this.asteroids, this.playerShip, mainGameState.onAsteroidPlayerCollision, null, this);
+    this.livesValue.setText(this.playerLife);
 }
 
 mainGameState.updatePlayer = function(){
@@ -162,13 +169,20 @@ mainGameState.spawnLaser = function(){
 }
 
 mainGameState.onAsteroidLaserCollision = function(asteroid, laser){
+    console.log(asteroid)
+    
     asteroid.destroy();
     laser.destroy();
-    
+
     this.playerScore++;
-    
+
     var index = game.rnd.integerInRange(0, this.playerHitSfx.length - 1);
     this.playerHitSfx[index].play();
+}
+
+mainGameState.onAsteroidPlayerCollision = function(asteroid, playerShip){
+    asteroid.destroy();
+    this.playerLife--;
 }
 
 
