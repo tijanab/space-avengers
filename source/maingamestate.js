@@ -1,5 +1,4 @@
-var mainGameState = { 
-}
+var mainGameState = {}
 
 mainGameState.preload = function() {
     game.load.image("space", "images/space.jpeg");
@@ -115,6 +114,10 @@ mainGameState.update = function() {
 
     game.physics.arcade.collide(this.asteroids, this.playerShip, mainGameState.onAsteroidPlayerCollision, null, this);
     this.livesValue.setText(this.playerLife);
+    
+    if ( this.playerLife <= 0 ) {
+        game.state.start("GameOver");
+    }
 }
 
 mainGameState.updatePlayer = function(){
