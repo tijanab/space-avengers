@@ -5,10 +5,15 @@ mainGameState.preload = function() {
     console.log("Pre-loading the Game");
     game.load.image("space", "images/space.jpeg");
     game.load.image("player-ship",
-    "assets/images/player-ship.png");
-    game.load.image("asteroid-large-01", "assets/images/asteroid-large-01.png");
-    game.load.image("asteroid-medium-01", "assets/images/asteroid-medium-01.png");
-    game.load.image("asteroid-small-01", "assets/images/asteroid-small-01.png");
+                    "SpaceShooterRedux/PNG/playerShip2_red.png");
+    game.load.image("asteroid-large-01", "SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png");
+    game.load.image("asteroid-medium-01", "SpaceShooterRedux/PNG/Meteors/meteorBrown_med1.png");
+    game.load.image("asteroid-small-01", "SpaceShooterRedux/PNG/Meteors/meteorBrown_small1.png");
+    game.load.image("laser", "SpaceShooterRedux/PNG/Lasers/laserRed16.png");
+    
+    game.load.audio("player_fire_01", "assets/audio/player_fire_01.mp3");
+    game.load.audio("asteroid_hit_01", "assets/audio/asteroid_hit_01.mp3");
+    game.load.audio("asteroid_death_01", "assets/audio/asteroid_death_01.mp3");
 }
 
 mainGameState.create = function() { 
@@ -17,22 +22,23 @@ mainGameState.create = function() {
     game.add.sprite(0, 0, 'space');
 
     var shipX = game.width * 0.5;
-    var shipY = game.height * 0.5;
-
+    var shipY = game.height * 0.9;
     this.playerShip = game.add.sprite(shipX, shipY, 'player-ship');
-
     this.playerShip.anchor.setTo(0.5, 0.5);
-
     game.physics.arcade.enable(this.playerShip);
-
     this.cursors = game.input.keyboard.createCursorKeys();
 
     this.asteroidTimer = game.rnd.integerInRange(1.0, 3.0);
-    
     this.asteroids = game.add.group();
-    //getRandom(0,3); 
-    //use this to randomize a asteroid from the group?
 
+    this.fireKey = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+    this.playerLaser = game.add.group();   
+    this.fireTimer = 0.4;
+    
+    this.playerFireSfx = [];
+    this.playerFireSfx.push(game.add.audio("asteroid_hit_01"));
+    this.playerFireSfx.push(game.add.audio("asteroid_death_01"));
+    this.playerFireSfx.push(game.add.audio("player_fire_01"));
 }
 
 mainGameState.update = function() {
@@ -50,6 +56,19 @@ mainGameState.update = function() {
         }
     }
 
+    if (this.fireKey.isDown) {
+        this.spawnLaser();
+    }
+
+    this.fireTimer -= game.time.physicsElapsed;
+
+    for(var i = 0; i< this.playerLaser.children.length; i++){
+        if(this.playerLaser.children[i].y < -200){
+            this.playerLaser.children[i].destroy();
+        }
+    }
+    
+    game.physics.arcade.collide(this.asteroids, this.playerLaser, mainGameState.onAsteroidLaserCollision, null, this);
 }
 
 mainGameState.updatePlayer = function(){
@@ -60,52 +79,75 @@ mainGameState.updatePlayer = function(){
     else if (this.cursors.left.isDown){
         this.playerShip.body.velocity.x = -300;
     }
-    else if (this.cursors.down.isDown){
+    /*else if (this.cursors.down.isDown){
         this.playerShip.body.velocity.y = 300;
-    }
-    else if (this.cursors.up.isDown){
+    }*/
+    /*else if (this.cursors.up.isDown){
         this.playerShip.body.velocity.y = -300;
-    } else{
+    }*/ else{
         this.playerShip.body.velocity.x = 0;
         this.playerShip.body.velocity.y = 0;
     }
     //wall boundaries
-    if ((this.playerShip.x > game.width) &&         (this.playerShip.body.velocity.x > 0)){
+    if ((this.playerShip.x > game.width) && (this.playerShip.body.velocity.x > 0)){
         this.playerShip.body.velocity.x = 0;
     }
     if ((this.playerShip.x < 0) && (this.playerShip.body.velocity.x < 0)){
         this.playerShip.body.velocity.x = 0;
     }
-    if ((this.playerShip.y > game.height) && (this.playerShip.body.velocity.y > 0)){
+    /*if ((this.playerShip.y > game.height) && (this.playerShip.body.velocity.y > 0)){
         this.playerShip.body.velocity.y = 0;
     }
     if ((this.playerShip.y < 0) && (this.playerShip.body.velocity.y < 0)){
         this.playerShip.body.velocity.y = 0;
-    }
+    }*/
 }
 
 mainGameState.spawnAsteroid = function(){
-    var xLarge = game.rnd.integerInRange(0, game.width);
-    var asteroidLarge = game.add.sprite(xLarge, 0, "asteroid-large-01");
-    asteroidLarge.anchor.setTo(0.5, 0.5);
-    game.physics.arcade.enable(asteroidLarge);
+    var arrAsteroid = [
+        "asteroid-large-01", "asteroid-medium-01", "asteroid-medium-01"
+    ];
+
+    var x = game.rnd.integerInRange(0, game.width);
+    var asteroid = game.add.sprite(x, 0, arrAsteroid[game.rnd.integerInRange(0,2)]);
+    asteroid.anchor.setTo(0.5, 0.5);
+    game.physics.arcade.enable(asteroid);
     var y = game.rnd.integerInRange(200, 20);
-    asteroidLarge.body.velocity.setTo(0, y);
-    this.asteroids.add(asteroidLarge);
-    
-    var xMedium = game.rnd.integerInRange(0, game.width);
-    var asteroidMedium = game.add.sprite(xMedium, 0, "asteroid-medium-01");
-    asteroidMedium.anchor.setTo(0.5, 0.5);
-    game.physics.arcade.enable(asteroidMedium);
-    var y = game.rnd.integerInRange(200, 20);
-    asteroidMedium.body.velocity.setTo(0, y);
-    this.asteroids.add(asteroidMedium);
-    
-    var xSmall = game.rnd.integerInRange(0, game.width);
-    var asteroidSmall = game.add.sprite(xSmall, 0, "asteroid-small-01");
-    asteroidSmall.anchor.setTo(0.5, 0.5);
-    game.physics.arcade.enable(asteroidSmall);
-    var y = game.rnd.integerInRange(200, 20);
-    asteroidSmall.body.velocity.setTo(0, y);
-    this.asteroids.add(asteroidSmall);
+    asteroid.body.velocity.setTo(0, y);
+    asteroid.body.angularVelocity = game.rnd.integerInRange(50,300);
+    this.asteroids.add(asteroid);
 }
+
+mainGameState.spawnLaser = function(){
+    if(this.fireTimer < 0){
+        this.fireTimer = 0.4;
+
+        var laser = game.add.sprite(this.playerShip.x, this.playerShip.y, "laser");
+        laser.anchor.setTo(0.5, 0.5);
+
+        game.physics.arcade.enable(laser);
+        laser.body.velocity.setTo(0, -200);
+
+        this.playerLaser.add(laser);
+    }
+}
+
+mainGameState.onAsteroidLaserCollision = function(asteroid, laser){
+    asteroid.destroy();
+    laser.destroy();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
