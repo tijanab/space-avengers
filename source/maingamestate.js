@@ -1,13 +1,14 @@
 var mainGameState = {}
 
 mainGameState.preload = function() {
-    game.load.image("winter", "kenney_holidaypack2016/background.png");
+    game.load.image("winter", "kenney_holidaypack2016/background-grinch.jpg");
     game.load.image("grinch",
                     "kenney_holidaypack2016/grinch.png");
-    game.load.image("asteroid-large-01", "kenney_holidaypack2016/PNG/Voxel pack/Default size/Santa/santa.png");
+    game.load.image("asteroid-large-01", "kenney_holidaypack2016/santa.png");
     game.load.image("asteroid-medium-01", "kenney_holidaypack2016/PNG/Topdown pack/Default size/topdownTile_40.png");
     game.load.image("asteroid-small-01", "kenney_holidaypack2016/PNG/RTS pack/Default size/RTSobject_05.png");
     game.load.image("laser", "SpaceShooterRedux/PNG/Lasers/laserRed16.png");
+    game.load.image("snow-flake", "kenney_holidaypack2016/snowflake.png");
 
     game.load.audio("player_fire_01", "assets/audio/player_fire_01.mp3");
     game.load.audio("player_fire_02", "assets/audio/player_fire_02.mp3");
@@ -33,7 +34,8 @@ mainGameState.create = function() {
 
     var shipX = game.width * 0.5;
     var shipY = game.height * 0.9;
-    this.playerShip = game.add.sprite(shipX, shipY, 'grinch');this.playerShip.scale.setTo(0.5,0.5);
+    this.playerShip = game.add.sprite(shipX, shipY, 'grinch');
+    this.playerShip.scale.setTo(0.5,0.5);
     this.playerShip.anchor.setTo(0.5, 0.5);
     game.physics.arcade.enable(this.playerShip);
     this.cursors = game.input.keyboard.createCursorKeys();
@@ -96,6 +98,7 @@ mainGameState.update = function() {
     }
     for(var i = 0; i < this.asteroids.children.length; i++){
         if(this.asteroids.children[i].y > (game.height + 200)){
+            this.playerLife--;
             this.asteroids.children[i].destroy();
         }
     }
@@ -142,11 +145,11 @@ mainGameState.updatePlayer = function(){
 
 mainGameState.spawnAsteroid = function(){
     var arrAsteroid = [
-        "asteroid-large-01", "asteroid-medium-01", "asteroid-small-01"
+        "asteroid-large-01", "asteroid-medium-01", "asteroid-small-01", "snow-flake"
     ];
 
     var x = game.rnd.integerInRange(0, game.width);
-    var asteroid = game.add.sprite(x, 0, arrAsteroid[game.rnd.integerInRange(0,2)]);
+    var asteroid = game.add.sprite(x, 0, arrAsteroid[game.rnd.integerInRange(0,3)]);
     asteroid.anchor.setTo(0.5, 0.5);
     game.physics.arcade.enable(asteroid);
     var y = game.rnd.integerInRange(200, 20);
@@ -187,7 +190,7 @@ mainGameState.onAsteroidPlayerCollision = function(object1, object2){
     }else{
         object2.pendingDestroy = true;
     }
-    this.playerLife -=1;
+    this.playerLife --;
 }
 
 
