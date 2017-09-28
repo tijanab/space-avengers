@@ -1,12 +1,12 @@
 var mainGameState = {}
 
 mainGameState.preload = function() {
-    game.load.image("space", "images/space.jpeg");
-    game.load.image("player-ship",
-                    "SpaceShooterRedux/PNG/playerShip2_red.png");
-    game.load.image("asteroid-large-01", "SpaceShooterRedux/PNG/Meteors/meteorBrown_big1.png");
-    game.load.image("asteroid-medium-01", "SpaceShooterRedux/PNG/Meteors/meteorBrown_med1.png");
-    game.load.image("asteroid-small-01", "SpaceShooterRedux/PNG/Meteors/meteorBrown_small1.png");
+    game.load.image("winter", "kenney_holidaypack2016/background.png");
+    game.load.image("grinch",
+                    "kenney_holidaypack2016/grinch.png");
+    game.load.image("asteroid-large-01", "kenney_holidaypack2016/PNG/Voxel pack/Default size/Santa/santa.png");
+    game.load.image("asteroid-medium-01", "kenney_holidaypack2016/PNG/Topdown pack/Default size/topdownTile_40.png");
+    game.load.image("asteroid-small-01", "kenney_holidaypack2016/PNG/RTS pack/Default size/RTSobject_05.png");
     game.load.image("laser", "SpaceShooterRedux/PNG/Lasers/laserRed16.png");
 
     game.load.audio("player_fire_01", "assets/audio/player_fire_01.mp3");
@@ -29,11 +29,11 @@ mainGameState.preload = function() {
 mainGameState.create = function() { 
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    game.add.sprite(0, 0, 'space');
+    game.add.sprite(0, 0, 'winter');
 
     var shipX = game.width * 0.5;
     var shipY = game.height * 0.9;
-    this.playerShip = game.add.sprite(shipX, shipY, 'player-ship');
+    this.playerShip = game.add.sprite(shipX, shipY, 'grinch');this.playerShip.scale.setTo(0.5,0.5);
     this.playerShip.anchor.setTo(0.5, 0.5);
     game.physics.arcade.enable(this.playerShip);
     this.cursors = game.input.keyboard.createCursorKeys();
@@ -171,11 +171,9 @@ mainGameState.spawnLaser = function(){
     this.playerFireSfx[index].play();
 }
 
-mainGameState.onAsteroidLaserCollision = function(asteroid, laser){
-    console.log(asteroid)
-    
-    asteroid.destroy();
-    laser.destroy();
+mainGameState.onAsteroidLaserCollision = function(object1, object2){   
+    object1.pendingDestroy = true;
+    object2.pendingDestroy = true;
 
     this.playerScore++;
 
@@ -183,9 +181,13 @@ mainGameState.onAsteroidLaserCollision = function(asteroid, laser){
     this.playerHitSfx[index].play();
 }
 
-mainGameState.onAsteroidPlayerCollision = function(asteroid, playerShip){
-    asteroid.destroy();
-    this.playerLife--;
+mainGameState.onAsteroidPlayerCollision = function(object1, object2){
+    if (object1.key.includes("asteroid")){
+        object1.pendingDestroy = true;
+    }else{
+        object2.pendingDestroy = true;
+    }
+    this.playerLife -=1;
 }
 
 

@@ -1,11 +1,15 @@
 body {
     margin: 0px;
     bottom: 0px;
-    
-    background-image: url("images/space.jpeg");
+
+    background-image: url("back-background.png");
     background-size: cover; 
-    
+
     font-family: "Century Gothic";
+}
+
+#header{
+}
 }
 
 h1 {
