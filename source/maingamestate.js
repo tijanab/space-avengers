@@ -42,6 +42,7 @@ mainGameState.create = function() {
     this.playerShip.scale.setTo(0.5,0.5);
     this.playerShip.anchor.setTo(0.5, 0.5);
     game.physics.arcade.enable(this.playerShip);
+    this.playerShip.body.immovable = true;
     this.cursors = game.input.keyboard.createCursorKeys();
 
     this.asteroidTimer = game.rnd.integerInRange(1.0, 3.0);
@@ -71,7 +72,7 @@ mainGameState.create = function() {
 
 
     var textStyle = {
-        font: "16px Comic Sans", 
+        font: "16px Century Gothic", 
         fill: "#ffffff", 
         align: "center"
     }
@@ -81,7 +82,6 @@ mainGameState.create = function() {
     this.scoreValue = game.add.text(game.width*0.95, 30, "0", textStyle);
     this.scoreValue.fixedToCamera = true;
     this.scoreValue.anchor.setTo(0.5, 0.5);
-    this.playerScore = 0;
 
     this.lifeTitle = game.add.text(game.width*0.1, 30, "LIFE: ", textStyle);
     this.lifeTitle.fixedToCamera = true;
@@ -105,21 +105,21 @@ mainGameState.create = function() {
 
     this.previousScore = game.global.score;
     this.asteroidVelocity = 100;
+    
 }
 
 mainGameState.update = function() {
     this.updatePlayer();
 
     if(game.global.score % 10 == 0 && game.global.score != 0 && game.global.score != this.previousScore){
-        this.asteroidVelocity += 100;
+        this.asteroidVelocity += 50;
     }
     this.previousScore = game.global.score;
 
     this.asteroidTimer -= game.time.physicsElapsed;
     if(this.asteroidTimer <= 0.0){
-        this.spawnAsteroid();
-        this.asteroidTimer = 1.0;
-        console.log(this.asteroidTimer);
+        this.spawnAsteroid(this.asteroidVelocity);
+        this.asteroidTimer = 2.0;
     }
     //console.log(this.asteroidTimer);
 
@@ -153,7 +153,7 @@ mainGameState.update = function() {
     }
 
     game.physics.arcade.collide(this.asteroids, this.playerLaser, mainGameState.onAsteroidLaserCollision, null, this);
-    this.scoreValue.setText(this.playerScore);
+    this.scoreValue.setText(game.global.score);
 
     game.physics.arcade.collide(this.asteroids, this.playerShip, mainGameState.onAsteroidPlayerCollision, null, this);
     this.livesValue.setText(this.playerLife);
@@ -201,12 +201,6 @@ mainGameState.spawnAsteroid = function(velocity){
     this.asteroids.add(asteroid);
 }
 
-mainGameState.updateCounter = function() {
-
-    total++;
-    console.log(total);
-
-}
 
 mainGameState.spawnLaser = function(){
     if(this.fireTimer < 0){
@@ -238,7 +232,7 @@ mainGameState.onAsteroidLaserCollision = function(object1, object2){
     object1.pendingDestroy = true;
     object2.pendingDestroy = true;
 
-    this.playerScore++;
+    game.global.score++;
 
     var index = game.rnd.integerInRange(0, this.playerHitSfx.length - 1);
     this.playerHitSfx[index].play();
