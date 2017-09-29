@@ -1,4 +1,6 @@
-# space-avengers
-Tjejer Kodar Project
+# the-grinch
 
-Space avengers - a game in space!
+THE GRINCH!
+
+A game made at Tjejer Kodar 2017.
+
