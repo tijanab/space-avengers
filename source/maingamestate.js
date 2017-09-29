@@ -28,6 +28,9 @@ mainGameState.preload = function() {
     game.load.audio("asteroid_death_01", "assets/audio/asteroid_death_03.mp3");*/
 }
 
+var timer;
+var total = 0;
+
 mainGameState.create = function() { 
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -90,16 +93,35 @@ mainGameState.create = function() {
     this.hearts = game.add.group();
     game.physics.arcade.enable(this.hearts);
     this.playerLife = 3;
+
+    //försöka så att det går snabbare med tiden
+    //  Create our Timer
+    /*this.timer = game.time.create(false);
+    //  Set a TimerEvent to occur after 2 seconds
+    this.timer.loop(2000, mainGameState.updateCounter, this);
+    //  Start the timer running - this is important!
+    //  It won't start automatically, allowing you to hook it to button events and the like.
+    this.timer.start(); */
+
+    this.previousScore = game.global.score;
+    this.asteroidVelocity = 100;
 }
 
 mainGameState.update = function() {
     this.updatePlayer();
 
+    if(game.global.score % 10 == 0 && game.global.score != 0 && game.global.score != this.previousScore){
+        this.asteroidVelocity += 100;
+    }
+    this.previousScore = game.global.score;
+
     this.asteroidTimer -= game.time.physicsElapsed;
     if(this.asteroidTimer <= 0.0){
         this.spawnAsteroid();
         this.asteroidTimer = 1.0;
+        console.log(this.asteroidTimer);
     }
+    //console.log(this.asteroidTimer);
 
     this.heartTimer -= game.time.physicsElapsed;
     if(this.heartTimer <= 0.0){
@@ -129,7 +151,7 @@ mainGameState.update = function() {
             this.hearts.children[i].destroy();
         }
     }
-    
+
     game.physics.arcade.collide(this.asteroids, this.playerLaser, mainGameState.onAsteroidLaserCollision, null, this);
     this.scoreValue.setText(this.playerScore);
 
@@ -142,6 +164,7 @@ mainGameState.update = function() {
     if ( this.playerLife <= 0 ) {
         game.state.start("GameOver");
     }
+
 }
 
 mainGameState.updatePlayer = function(){
@@ -164,7 +187,7 @@ mainGameState.updatePlayer = function(){
     }
 }
 
-mainGameState.spawnAsteroid = function(){
+mainGameState.spawnAsteroid = function(velocity){
     var arrAsteroid = [
         "asteroid-large-01", "asteroid-medium-01", "asteroid-small-01", "snow-flake"
     ];
@@ -173,15 +196,17 @@ mainGameState.spawnAsteroid = function(){
     var asteroid = game.add.sprite(x, 0, arrAsteroid[game.rnd.integerInRange(0,3)]);
     asteroid.anchor.setTo(0.5, 0.5);
     game.physics.arcade.enable(asteroid);
-    var y = game.rnd.integerInRange(200, 20);
-    asteroid.body.velocity.setTo(0, y);
+    speed = asteroid.body.velocity.setTo(0, velocity);
     asteroid.body.angularVelocity = game.rnd.integerInRange(50,300);
     this.asteroids.add(asteroid);
 }
 
-/*mainGameState.spawnLife = function(){
+mainGameState.updateCounter = function() {
 
-}*/
+    total++;
+    console.log(total);
+
+}
 
 mainGameState.spawnLaser = function(){
     if(this.fireTimer < 0){
@@ -205,7 +230,7 @@ mainGameState.spawnHeart = function(){
     game.physics.arcade.enable(heart);
     //var y = game.rnd.integerInRanger(200,20);
     heart.body.velocity.setTo(0, 100);
-    
+
     this.hearts.add(heart);
 }
 

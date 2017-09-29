@@ -15,6 +15,10 @@
         <div id="gameContainer"></div>
         <script> 
             var game = new Phaser.Game(600, 600, Phaser.AUTO, 'gameContainer');
+            
+            game.global = {
+                score : 0
+            }
         </script>
         <script> 
             game.state.add('Start', startState);
