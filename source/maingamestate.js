@@ -9,6 +9,7 @@ mainGameState.preload = function() {
     game.load.image("asteroid-small-01", "kenney_holidaypack2016/PNG/RTS pack/Default size/RTSobject_05.png");
     game.load.image("laser", "SpaceShooterRedux/PNG/Lasers/laserRed16.png");
     game.load.image("snow-flake", "kenney_holidaypack2016/snowflake.png");
+    game.load.image("heart", "heart.png");
 
     game.load.audio("player_fire_01", "assets/audio/player_fire_01.mp3");
     game.load.audio("player_fire_02", "assets/audio/player_fire_02.mp3");
@@ -43,6 +44,8 @@ mainGameState.create = function() {
     this.asteroidTimer = game.rnd.integerInRange(1.0, 3.0);
     this.asteroids = game.add.group();
 
+    this.heartTimer = game.rnd.integerInRange(6.0, 10.0);
+
     this.fireKey = game.input.keyboard.addKey(Phaser.Keyboard.Z);
     this.playerLaser = game.add.group();   
     this.fireTimer = 0.4;
@@ -65,7 +68,7 @@ mainGameState.create = function() {
 
 
     var textStyle = {
-        font: "16px Arial", 
+        font: "16px Comic Sans", 
         fill: "#ffffff", 
         align: "center"
     }
@@ -76,15 +79,16 @@ mainGameState.create = function() {
     this.scoreValue.fixedToCamera = true;
     this.scoreValue.anchor.setTo(0.5, 0.5);
     this.playerScore = 0;
-    
+
     this.lifeTitle = game.add.text(game.width*0.1, 30, "LIFE: ", textStyle);
     this.lifeTitle.fixedToCamera = true;
     this.lifeTitle.anchor.setTo(0.5, 0.5);
     this.livesValue = game.add.text(game.width*0.2, 30, "3", textStyle);
     this.livesValue.fixedToCamera = true;
     this.livesValue.anchor.setTo(0.5, 0.5);
-    
-    game.physics.arcade.enable(this.playerShip);
+
+    this.hearts = game.add.group();
+    game.physics.arcade.enable(this.hearts);
     this.playerLife = 3;
 }
 
@@ -94,8 +98,15 @@ mainGameState.update = function() {
     this.asteroidTimer -= game.time.physicsElapsed;
     if(this.asteroidTimer <= 0.0){
         this.spawnAsteroid();
-        this.asteroidTimer = game.rnd.integerInRange(1.0, 3.0);;
+        this.asteroidTimer = 1.0;
     }
+
+    this.heartTimer -= game.time.physicsElapsed;
+    if(this.heartTimer <= 0.0){
+        this.spawnHeart();
+        this.heartTimer = 8.0;
+    }
+
     for(var i = 0; i < this.asteroids.children.length; i++){
         if(this.asteroids.children[i].y > (game.height + 200)){
             this.playerLife--;
@@ -112,12 +123,22 @@ mainGameState.update = function() {
             this.playerLaser.children[i].destroy();
         }
     }
+
+    for(var i = 0; i< this.hearts.children.length; i++){
+        if(this.hearts.children[i].y < -200){
+            this.hearts.children[i].destroy();
+        }
+    }
+    
     game.physics.arcade.collide(this.asteroids, this.playerLaser, mainGameState.onAsteroidLaserCollision, null, this);
     this.scoreValue.setText(this.playerScore);
 
     game.physics.arcade.collide(this.asteroids, this.playerShip, mainGameState.onAsteroidPlayerCollision, null, this);
     this.livesValue.setText(this.playerLife);
-    
+
+    game.physics.arcade.collide(this.hearts, this.playerShip, mainGameState.onHeartPlayerCollision, null, this);
+    this.livesValue.setText(this.playerLife);
+
     if ( this.playerLife <= 0 ) {
         game.state.start("GameOver");
     }
@@ -158,6 +179,10 @@ mainGameState.spawnAsteroid = function(){
     this.asteroids.add(asteroid);
 }
 
+/*mainGameState.spawnLife = function(){
+
+}*/
+
 mainGameState.spawnLaser = function(){
     if(this.fireTimer < 0){
         this.fireTimer = 0.4;
@@ -172,6 +197,16 @@ mainGameState.spawnLaser = function(){
     }
     var index = game.rnd.integerInRange(0, this.playerFireSfx.length - 1);
     this.playerFireSfx[index].play();
+}
+
+mainGameState.spawnHeart = function(){
+    var x = game.rnd.integerInRange(0, game.width);
+    var heart = game.add.sprite(x, 0, "heart");
+    game.physics.arcade.enable(heart);
+    //var y = game.rnd.integerInRanger(200,20);
+    heart.body.velocity.setTo(0, 100);
+    
+    this.hearts.add(heart);
 }
 
 mainGameState.onAsteroidLaserCollision = function(object1, object2){   
@@ -193,6 +228,14 @@ mainGameState.onAsteroidPlayerCollision = function(object1, object2){
     this.playerLife --;
 }
 
+mainGameState.onHeartPlayerCollision = function(object1, object2){
+    if (object1.key.includes("heart")){
+        object1.pendingDestroy = true;
+    }else{
+        object2.pendingDestroy = true;
+    }
+    this.playerLife++;
+}
 
 
 
