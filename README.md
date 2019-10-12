@@ -2,5 +2,5 @@
 
 THE GRINCH!
 
-A game made at Tjejer Kodar 2017.
+A game made with Javascript and Phaser at Tjejer Kodar 2017.
 
